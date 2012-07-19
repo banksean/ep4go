@@ -6,13 +6,13 @@ import (
 	"image/png"
 	"ftree"
 	"fmt"
-    "net/http"
+  "net/http"
 	"perlin"
 	"time"
 )
 
 var (
-	f = ftree.NewFTree("add", ftree.Var("x"), ftree.Var("y"), ftree.NewFTree("mul", ftree.Var("x"), ftree.Var("y"), ftree.Const(1000)))
+	f = ftree.NewRandomFTree(4) //ftree.NewFTree("add", ftree.Var("x"), ftree.Var("y"))
 )
 
 func init() {
@@ -20,8 +20,8 @@ func init() {
 }
 
 const (
-	W = 16
-	H = 16
+	W = 256
+	H = 256
 )
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +53,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 	    	m.Set(x, y, color.RGBA{red, green, blue, alpha})
 		}
 	}
-    w.Header().Set("Content-Type", "image/png")
+
+  w.Header().Set("Content-Type", "image/png")
 	if err := png.Encode(w, m); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

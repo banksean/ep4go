@@ -1,7 +1,8 @@
 package ftree
 
 import (
-	"fmt"
+  "fmt"
+//	"log"
 	"math"
 	"math/rand"
 )
@@ -13,6 +14,15 @@ type FTree struct {
 	args []*FTree
 	constVal float64
 	varName string
+}
+
+func (f *FTree) String() string {
+  s := fmt.Sprintf("op: %q, constVal: %f, varName: %q\n\t", f.op, f.constVal, f.varName)
+  s += fmt.Sprintf("%v", f.args)
+//  for _, arg := range f.args {
+//    s += arg.String()
+//  }
+  return s
 }
 
 func (f *FTree) Eval() (float64, error) {
@@ -42,7 +52,7 @@ func (f *FTree) Eval() (float64, error) {
 			}
 			return ret, nil
 		case "mul":
-			ret := 0.0
+			ret := 1.0
 			for _, arg := range f.args {
 				v, err := arg.Eval()
 				if err != nil {
@@ -60,11 +70,25 @@ func (f *FTree) EvalSigmoid() (uint8, error) {
 	return uint8(Sigmoid(v) * 256), err
 }
 
+func randOp() string {
+  ops := [...]string{"add", "sub", "mul", "const", "var"}
+  return ops[rand.Int() % len(ops)]
+}
+
 func NewRandomFTree(depth int32) *FTree {
-	randOp := "add"
-	randArgs := make([]*FTree, rand.Uint32() % 10)
-	randConst := 0.0
-	randVar := "x"
+  randConst := rand.Float64()
+  randVar := "x"
+  if rand.Float64() > 0.5 {
+    randVar = "y"
+  }
+	randOp := randOp()
+	randArgs := make([]*FTree, rand.Uint32() % 5)
+  if depth > 0 {
+    for i, _ := range randArgs {
+      randArgs[i] = NewRandomFTree(depth-1)
+    }
+  }
+
 	return &FTree{randOp, randArgs, randConst, randVar}
 }
 
